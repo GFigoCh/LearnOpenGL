@@ -4,6 +4,9 @@ class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        using (var game = new Game(800, 600, "LearnOpenGL"))
+        {
+            game.Run();
+        }
     }
 }
