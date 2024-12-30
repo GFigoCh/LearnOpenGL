@@ -11,10 +11,10 @@ public class Game : GameWindow
     private int _vertexArrayObject = 0;
     private int _vertexBufferObject = 0;
     private float[] _vertices = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.5f, 0.5f, 0.0f,
-        -0.5f, 0.5f, 0.0f
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f
     };
     private int _elementBufferObject = 0;
     private uint[] _indices = {
@@ -46,9 +46,16 @@ public class Game : GameWindow
         GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
         GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
         
-        int attribLocation = _shader.GetAttribLocation("aPosition");
-        GL.VertexAttribPointer(attribLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-        GL.EnableVertexAttribArray(attribLocation);
+        int aPositionLocation = _shader.GetAttribLocation("aPosition");
+        GL.VertexAttribPointer(aPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+        GL.EnableVertexAttribArray(aPositionLocation);
+
+        int aColorLocation = _shader.GetAttribLocation("aColor");
+        GL.VertexAttribPointer(aColorLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
+        GL.EnableVertexAttribArray(aColorLocation);
+
+        // int uniformLocation = _shader.GetUniformLocation("globalColor");
+        // GL.Uniform4(uniformLocation, 1.0f, 0.5f, 0.2f, 1.0f);
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)

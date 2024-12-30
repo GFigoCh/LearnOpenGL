@@ -53,6 +53,11 @@ public class Shader : IDisposable
         return GL.GetAttribLocation(_handle, attribName);
     }
 
+    public int GetUniformLocation(string uniformName)
+    {
+        return GL.GetUniformLocation(_handle, uniformName);
+    }
+
     public void Use()
     {
         GL.UseProgram(_handle);
