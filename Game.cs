@@ -7,14 +7,20 @@ namespace LearnOpenGL;
 
 public class Game : GameWindow
 {
+    private Shader _shader = null!;
+    private int _vertexArrayObject = 0;
+    private int _vertexBufferObject = 0;
     private float[] _vertices = {
         -0.5f, -0.5f, 0.0f,
         0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f
+        0.5f, 0.5f, 0.0f,
+        -0.5f, 0.5f, 0.0f
     };
-    private int _vertexBufferObject = 0;
-    private Shader _shader = null!;
-    private int _vertexArrayObject = 0;
+    private int _elementBufferObject = 0;
+    private uint[] _indices = {
+        0, 1, 2,
+        2, 3, 0
+    };
 
     public Game(int width, int height, string title)
         : base(GameWindowSettings.Default,
@@ -26,15 +32,19 @@ public class Game : GameWindow
         
         GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-        _vertexBufferObject = GL.GenBuffer();
-        GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-        GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
-
         _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
         _shader.Use();
 
         _vertexArrayObject = GL.GenVertexArray();
         GL.BindVertexArray(_vertexArrayObject);
+
+        _vertexBufferObject = GL.GenBuffer();
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
+        GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
+
+        _elementBufferObject = GL.GenBuffer();
+        GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
+        GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
         
         int attribLocation = _shader.GetAttribLocation("aPosition");
         GL.VertexAttribPointer(attribLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
@@ -47,7 +57,7 @@ public class Game : GameWindow
 
         GL.Clear(ClearBufferMask.ColorBufferBit);
 
-        GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+        GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
 
         SwapBuffers();
     }

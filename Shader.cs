@@ -9,14 +9,13 @@ public class Shader : IDisposable
 
     public Shader(string vertexPath, string fragmentPath)
     {
-        string vertexShaderSource = File.ReadAllText(vertexPath);
-        string fragmentShaderSource = File.ReadAllText(fragmentPath);
-
         int vertexShader = GL.CreateShader(ShaderType.VertexShader);
+        string vertexShaderSource = File.ReadAllText(vertexPath);
         GL.ShaderSource(vertexShader, vertexShaderSource);
         CompileShader(vertexShader);
 
         int fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
+        string fragmentShaderSource = File.ReadAllText(fragmentPath);
         GL.ShaderSource(fragmentShader, fragmentShaderSource);
         CompileShader(fragmentShader);
 
@@ -31,11 +30,11 @@ public class Shader : IDisposable
             Console.WriteLine(GL.GetProgramInfoLog(_handle));
         }
 
-        GL.DetachShader(_handle, vertexShader);
-        GL.DeleteShader(vertexShader);
-
         GL.DetachShader(_handle, fragmentShader);
         GL.DeleteShader(fragmentShader);
+
+        GL.DetachShader(_handle, vertexShader);
+        GL.DeleteShader(vertexShader);
     }
 
     private void CompileShader(int shader)
