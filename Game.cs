@@ -8,13 +8,14 @@ namespace LearnOpenGL;
 public class Game : GameWindow
 {
     private Shader _shader = null!;
+    private Texture _texture = null!;
     private int _vertexArrayObject = 0;
     private int _vertexBufferObject = 0;
     private float[] _vertices = {
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.0f, 0.0f, 1.0f
     };
     private int _elementBufferObject = 0;
     private uint[] _indices = {
@@ -35,6 +36,8 @@ public class Game : GameWindow
         _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
         _shader.Use();
 
+        _texture = new Texture("Textures/container_wood.jpg");
+
         _vertexArrayObject = GL.GenVertexArray();
         GL.BindVertexArray(_vertexArrayObject);
 
@@ -47,15 +50,12 @@ public class Game : GameWindow
         GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
         
         int aPositionLocation = _shader.GetAttribLocation("aPosition");
-        GL.VertexAttribPointer(aPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+        GL.VertexAttribPointer(aPositionLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
         GL.EnableVertexAttribArray(aPositionLocation);
 
-        int aColorLocation = _shader.GetAttribLocation("aColor");
-        GL.VertexAttribPointer(aColorLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
-        GL.EnableVertexAttribArray(aColorLocation);
-
-        // int uniformLocation = _shader.GetUniformLocation("globalColor");
-        // GL.Uniform4(uniformLocation, 1.0f, 0.5f, 0.2f, 1.0f);
+        int aTextureLocation = _shader.GetAttribLocation("aTexture");
+        GL.VertexAttribPointer(aTextureLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
+        GL.EnableVertexAttribArray(aTextureLocation);
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)
