@@ -9,6 +9,7 @@ public class Game : GameWindow
 {
     private Shader _shader = null!;
     private Texture _texture = null!;
+    private Texture _textureLayer = null!;
     private int _vertexArrayObject = 0;
     private int _vertexBufferObject = 0;
     private float[] _vertices = {
@@ -35,8 +36,13 @@ public class Game : GameWindow
 
         _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
         _shader.Use();
+        _shader.SetTextureSampler("texture0", 0);
+        _shader.SetTextureSampler("texture1", 1);
 
         _texture = new Texture("Textures/container_wood.jpg");
+        _textureLayer = new Texture("Textures/leaf_corners.png");
+        _texture.Use();
+        _textureLayer.Use(TextureUnit.Texture1);
 
         _vertexArrayObject = GL.GenVertexArray();
         GL.BindVertexArray(_vertexArrayObject);

@@ -58,6 +58,11 @@ public class Shader : IDisposable
         return GL.GetUniformLocation(_handle, uniformName);
     }
 
+    public void SetTextureSampler(string samplerName, int index)
+    {
+        GL.Uniform1(GetUniformLocation(samplerName), index);
+    }
+
     public void Use()
     {
         GL.UseProgram(_handle);

@@ -20,8 +20,9 @@ public class Texture
         GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
     }
 
-    private void Use()
+    public void Use(TextureUnit unit = TextureUnit.Texture0)
     {
+        GL.ActiveTexture(unit);
         GL.BindTexture(TextureTarget.Texture2D, _handle);
     }
 }
