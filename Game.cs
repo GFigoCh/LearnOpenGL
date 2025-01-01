@@ -1,4 +1,5 @@
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -62,6 +63,19 @@ public class Game : GameWindow
         int aTextureLocation = _shader.GetAttribLocation("aTexture");
         GL.VertexAttribPointer(aTextureLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
         GL.EnableVertexAttribArray(aTextureLocation);
+
+        TransformTest();
+    }
+
+    private void TransformTest()
+    {
+        var translation = Matrix4.CreateTranslation(1.0f, 1.0f, 0.0f);
+        var rotation = Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(90.0f));
+        var scale = Matrix4.CreateScale(0.5f, 0.5f, 0.0f);
+        Matrix4 transform = translation * rotation * scale;
+
+        int transformLocation = _shader.GetUniformLocation("transform");
+        GL.UniformMatrix4(transformLocation, true, ref transform);
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)
