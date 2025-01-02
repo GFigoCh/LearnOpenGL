@@ -75,7 +75,7 @@ public class Game : GameWindow
         Matrix4 transform = translation * rotation * scale;
 
         int transformLocation = _shader.GetUniformLocation("transform");
-        GL.UniformMatrix4(transformLocation, true, ref transform);
+        GL.UniformMatrix4(transformLocation, false, ref transform);
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)
