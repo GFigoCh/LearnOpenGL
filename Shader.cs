@@ -1,4 +1,5 @@
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 
 namespace LearnOpenGL;
 
@@ -61,6 +62,11 @@ public class Shader : IDisposable
     public void SetTextureSampler(string samplerName, int index)
     {
         GL.Uniform1(GetUniformLocation(samplerName), index);
+    }
+
+    public void SetCoordinateSystem(string name, ref Matrix4 matrix)
+    {
+        GL.UniformMatrix4(GetUniformLocation(name), false, ref matrix);
     }
 
     public void Use()
