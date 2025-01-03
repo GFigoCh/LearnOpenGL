@@ -99,10 +99,8 @@ public class Game : GameWindow
         _shader.SetTextureSampler("texture0", 0);
         _shader.SetTextureSampler("texture1", 1);
 
-        _texture = new Texture("Textures/container_wood.jpg");
-        _textureLayer = new Texture("Textures/leaf_corners.png");
-        _texture.Use();
-        _textureLayer.Use(TextureUnit.Texture1);
+        _texture = new Texture(TextureUnit.Texture0, "Textures/container_wood.jpg");
+        _textureLayer = new Texture(TextureUnit.Texture1, "Textures/leaf_corners.png");
 
         _vertexArrayObject = GL.GenVertexArray();
         GL.BindVertexArray(_vertexArrayObject);

@@ -7,10 +7,10 @@ public class Texture
 {
     private int _handle = 0;
 
-    public Texture(string texturePath)
+    public Texture(TextureUnit unit, string texturePath)
     {
         _handle = GL.GenTexture();
-        Use();
+        Use(unit);
 
         StbImage.stbi_set_flip_vertically_on_load(1);
 
@@ -20,7 +20,7 @@ public class Texture
         GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
     }
 
-    public void Use(TextureUnit unit = TextureUnit.Texture0)
+    public void Use(TextureUnit unit)
     {
         GL.ActiveTexture(unit);
         GL.BindTexture(TextureTarget.Texture2D, _handle);
