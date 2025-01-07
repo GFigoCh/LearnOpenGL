@@ -92,8 +92,8 @@ public class Game : GameWindow
     {
         base.OnLoad();
         
-        GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         GL.Enable(EnableCap.DepthTest);
+        GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         CursorState = CursorState.Grabbed;
 
         _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
@@ -123,17 +123,16 @@ public class Game : GameWindow
         GL.VertexAttribPointer(aTextureLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
         GL.EnableVertexAttribArray(aTextureLocation);
 
-        _model = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(-55.0f));
+        _model = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45.0f));
         _shader.SetCoordinateSystem("model", ref _model);
 
         var cameraPosition = new Vector3(0.0f, 0.0f, 3.0f);
         var cameraTarget = new Vector3(0.0f, 0.0f, 1.0f);
         var cameraUp = new Vector3(0.0f, 1.0f, 0.0f);
-        _camera = new Camera(cameraPosition, cameraTarget, cameraUp);
+        _camera = new Camera(cameraPosition, cameraTarget, cameraUp, FramebufferSize.X / (float)FramebufferSize.Y);
         _view = _camera.LookAt();
         _shader.SetCoordinateSystem("view", ref _view);
-
-        _projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), ClientSize.X / (float)ClientSize.Y, 0.1f, 100.0f);
+        _projection = _camera.CreatePerspectiveFieldOfView();
         _shader.SetCoordinateSystem("projection", ref _projection);
     }
 
@@ -145,11 +144,13 @@ public class Game : GameWindow
 
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-        var model = _model * Matrix4.CreateRotationY((float)MathHelper.DegreesToRadians(_timeElapsed * 100.0));
+        var model = _model * Matrix4.CreateRotationY(MathHelper.DegreesToRadians((float)_timeElapsed * 10.0f));
         _shader.SetCoordinateSystem("model", ref model);
 
         _view = _camera.LookAt();
         _shader.SetCoordinateSystem("view", ref _view);
+        _projection = _camera.CreatePerspectiveFieldOfView();
+        _shader.SetCoordinateSystem("projection", ref _projection);
 
         GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
 
@@ -160,13 +161,33 @@ public class Game : GameWindow
     {
         base.OnUpdateFrame(args);
 
-        if (KeyboardState.IsKeyDown(Keys.Escape))
-        {
-            Close();
-        }
-
         _camera.KeyboardHandler(KeyboardState, args.Time);
-        _camera.MouseHandler(MouseState);
+    }
+
+    protected override void OnKeyDown(KeyboardKeyEventArgs args)
+    {
+        base.OnKeyDown(args);
+        
+        switch (args.Key)
+        {
+            case Keys.Escape:
+                Close();
+                break;
+        }
+    }
+
+    protected override void OnMouseMove(MouseMoveEventArgs args)
+    {
+        base.OnMouseMove(args);
+
+        _camera.MouseMoveHandler(args.DeltaX, args.DeltaY);
+    }
+
+    protected override void OnMouseWheel(MouseWheelEventArgs args)
+    {
+        base.OnMouseWheel(args);
+
+        _camera.MouseWheelHandler(args.OffsetY);
     }
 
     protected override void OnFramebufferResize(FramebufferResizeEventArgs args)
@@ -174,6 +195,8 @@ public class Game : GameWindow
         base.OnFramebufferResize(args);
 
         GL.Viewport(0, 0, args.Width, args.Height);
+
+        _camera.FramebufferResizeHandler(args.Width, args.Height);
     }
 
     protected override void OnUnload()

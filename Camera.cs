@@ -15,24 +15,33 @@ public class Camera
     private float _pitch;
     private float _yaw;
 
-    public Camera(Vector3 position, Vector3 target, Vector3 up)
+    private float _fov;
+    private float _aspectRatio;
+
+    public Camera(Vector3 position, Vector3 target, Vector3 up, float aspectRatio)
     {
         _speed = 1.0f;
-        
         _position = position;
         _target = target;
         _up = up;
-        
         _right = Vector3.Normalize(Vector3.Cross(_up, _target));
 
         _sensitivity = 0.1f;
         _pitch = 0.0f;
         _yaw = 90.0f;
+
+        _fov = 45.0f;
+        _aspectRatio = aspectRatio;
     }
 
     public Matrix4 LookAt()
     {
         return Matrix4.LookAt(_position, _position - _target, _up);
+    }
+
+    public Matrix4 CreatePerspectiveFieldOfView()
+    {
+        return Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(_fov), _aspectRatio, 0.1f, 100.0f);
     }
 
     public void KeyboardHandler(KeyboardState state, double deltaTime)
@@ -68,10 +77,10 @@ public class Camera
         }
     }
 
-    public void MouseHandler(MouseState state)
+    public void MouseMoveHandler(float deltaX, float deltaY)
     {
-        _yaw += state.Delta.X * _sensitivity;
-        _pitch = Math.Clamp(_pitch + state.Delta.Y * _sensitivity, -89.0f, 89.0f);
+        _yaw += deltaX * _sensitivity;
+        _pitch = Math.Clamp(_pitch + deltaY * _sensitivity, -89.0f, 89.0f);
         
         float yawRadians = MathHelper.DegreesToRadians(_yaw);
         float pitchRadians = MathHelper.DegreesToRadians(_pitch);
@@ -80,5 +89,15 @@ public class Camera
         _target.Z = (float)(Math.Cos(pitchRadians) * Math.Sin(yawRadians));
 
         _right = Vector3.Normalize(Vector3.Cross(_up, _target));
+    }
+
+    public void MouseWheelHandler(float offsetY)
+    {
+        _fov = Math.Clamp(_fov - offsetY, 1.0f, 180.0f);
+    }
+
+    public void FramebufferResizeHandler(int width, int height)
+    {
+        _aspectRatio = width / (float)height;
     }
 }
