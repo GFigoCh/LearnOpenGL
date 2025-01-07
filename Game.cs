@@ -80,6 +80,7 @@ public class Game : GameWindow
     private Matrix4 _model;
     private Matrix4 _view;
     private Matrix4 _projection;
+    private Camera _camera = null!;
 
     private double _timeElapsed = 0.0;
 
@@ -93,6 +94,7 @@ public class Game : GameWindow
         
         GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         GL.Enable(EnableCap.DepthTest);
+        CursorState = CursorState.Grabbed;
 
         _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
         _shader.Use();
@@ -124,7 +126,11 @@ public class Game : GameWindow
         _model = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(-55.0f));
         _shader.SetCoordinateSystem("model", ref _model);
 
-        _view = Matrix4.CreateTranslation(0.0f, 0.0f, -3.0f);
+        var cameraPosition = new Vector3(0.0f, 0.0f, 3.0f);
+        var cameraTarget = new Vector3(0.0f, 0.0f, 1.0f);
+        var cameraUp = new Vector3(0.0f, 1.0f, 0.0f);
+        _camera = new Camera(cameraPosition, cameraTarget, cameraUp);
+        _view = _camera.LookAt();
         _shader.SetCoordinateSystem("view", ref _view);
 
         _projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), ClientSize.X / (float)ClientSize.Y, 0.1f, 100.0f);
@@ -142,6 +148,9 @@ public class Game : GameWindow
         var model = _model * Matrix4.CreateRotationY((float)MathHelper.DegreesToRadians(_timeElapsed * 100.0));
         _shader.SetCoordinateSystem("model", ref model);
 
+        _view = _camera.LookAt();
+        _shader.SetCoordinateSystem("view", ref _view);
+
         GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
 
         SwapBuffers();
@@ -155,6 +164,9 @@ public class Game : GameWindow
         {
             Close();
         }
+
+        _camera.KeyboardHandler(KeyboardState, args.Time);
+        _camera.MouseHandler(MouseState);
     }
 
     protected override void OnFramebufferResize(FramebufferResizeEventArgs args)
