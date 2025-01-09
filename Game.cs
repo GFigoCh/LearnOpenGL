@@ -82,19 +82,16 @@ public class Game : GameWindow
     private Matrix4 _projection;
     private Camera _camera = null!;
 
-    private double _timeElapsed = 0.0;
-
-    public Game(int width, int height, string title)
-        : base(GameWindowSettings.Default,
-            new NativeWindowSettings() {ClientSize = (width, height), Title = title}) {}
+    public Game(GameWindowSettings gws, NativeWindowSettings nws) : base(gws, nws) {}
 
     protected override void OnLoad()
     {
         base.OnLoad();
         
+        CursorState = CursorState.Grabbed;
+        
         GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        CursorState = CursorState.Grabbed;
 
         _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
         _shader.Use();
@@ -140,12 +137,10 @@ public class Game : GameWindow
     {
         base.OnRenderFrame(args);
 
-        _timeElapsed += args.Time;
-
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-        var model = _model * Matrix4.CreateRotationY(MathHelper.DegreesToRadians((float)_timeElapsed * 10.0f));
-        _shader.SetCoordinateSystem("model", ref model);
+        _model *= Matrix4.CreateRotationY(MathHelper.DegreesToRadians((float)args.Time * 45.0f));
+        _shader.SetCoordinateSystem("model", ref _model);
 
         _view = _camera.LookAt();
         _shader.SetCoordinateSystem("view", ref _view);
