@@ -8,6 +8,8 @@ public class Program
     private static void Main(string[] args)
     {
         var gws = GameWindowSettings.Default;
+        gws.UpdateFrequency = 60.0;
+
         var nws = NativeWindowSettings.Default;
         nws.ClientSize = new Vector2i(800, 600);
         nws.Title = "Learning OpenGL";
