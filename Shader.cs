@@ -49,6 +49,11 @@ public class Shader : IDisposable
         }
     }
 
+    public void Use()
+    {
+        GL.UseProgram(_handle);
+    }
+
     public int GetAttribLocation(string attribName)
     {
         return GL.GetAttribLocation(_handle, attribName);
@@ -69,9 +74,9 @@ public class Shader : IDisposable
         GL.UniformMatrix4(GetUniformLocation(name), false, ref matrix);
     }
 
-    public void Use()
+    public void SetUniform4(string name, Vector4 vector)
     {
-        GL.UseProgram(_handle);
+        GL.Uniform4(GetUniformLocation(name), vector);
     }
 
     protected virtual void Dispose(bool disposing)

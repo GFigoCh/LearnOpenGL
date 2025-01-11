@@ -20,7 +20,7 @@ public class Camera
 
     public Camera(Vector3 position, Vector3 target, Vector3 up, float aspectRatio)
     {
-        _speed = 1.0f;
+        _speed = 5.0f;
         _position = position;
         _target = target;
         _up = up;

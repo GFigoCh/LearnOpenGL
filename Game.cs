@@ -9,7 +9,8 @@ namespace LearnOpenGL;
 
 public class Game : GameWindow
 {
-    private GettingStarted_Cube _gsCube = null!;
+    private Lighting_Light _lLight = null!;
+    private Lighting_Cube _lCube = null!;
 
     private Matrix4 _view;
     private Matrix4 _projection;
@@ -24,16 +25,22 @@ public class Game : GameWindow
         CursorState = CursorState.Grabbed;
         
         GL.Enable(EnableCap.DepthTest);
-        GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        GL.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
-        var cameraPosition = new Vector3(0.0f, 0.0f, 3.0f);
+        var cameraPosition = new Vector3(0.0f, 0.0f, 5.0f);
         var cameraTarget = new Vector3(0.0f, 0.0f, 1.0f);
         var cameraUp = new Vector3(0.0f, 1.0f, 0.0f);
         _camera = new Camera(cameraPosition, cameraTarget, cameraUp, FramebufferSize.X / (float)FramebufferSize.Y);
         _view = _camera.LookAt();
         _projection = _camera.CreatePerspectiveFieldOfView();
         
-        _gsCube = new GettingStarted_Cube(_view, _projection);
+        var lightColor = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+        var cubeColor = new Vector4(1.0f, 0.5f, 0.3f, 1.0f);
+        _lLight = new Lighting_Light(_view, _projection);
+        _lLight.SetObjectColor(lightColor);
+        _lCube = new Lighting_Cube(_view, _projection);
+        _lCube.SetObjectColor(cubeColor);
+        _lCube.SetLightColor(lightColor);
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)
@@ -45,7 +52,8 @@ public class Game : GameWindow
         _view = _camera.LookAt();
         _projection = _camera.CreatePerspectiveFieldOfView();
 
-        _gsCube.Draw(_view, _projection, args.Time);
+        _lCube.Draw(_view, _projection, args.Time);
+        _lLight.Draw(_view, _projection, args.Time);
 
         SwapBuffers();
     }
@@ -96,6 +104,7 @@ public class Game : GameWindow
     {
         base.OnUnload();
 
-        _gsCube.Dispose();
+        _lCube.Dispose();
+        _lLight.Dispose();
     }
 }
