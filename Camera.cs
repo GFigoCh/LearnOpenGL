@@ -7,6 +7,7 @@ public class Camera
 {
     private float _speed;
     private Vector3 _position;
+    public Vector3 Position => _position;
     private Vector3 _target;
     private Vector3 _up;
     private Vector3 _right;
@@ -17,6 +18,8 @@ public class Camera
 
     private float _fov;
     private float _aspectRatio;
+    private float _depthNear;
+    private float _depthFar;
 
     public Camera(Vector3 position, Vector3 target, Vector3 up, float aspectRatio)
     {
@@ -32,6 +35,8 @@ public class Camera
 
         _fov = 45.0f;
         _aspectRatio = aspectRatio;
+        _depthNear = 0.1f;
+        _depthFar = 100.0f;
     }
 
     public Matrix4 LookAt()
@@ -41,7 +46,7 @@ public class Camera
 
     public Matrix4 CreatePerspectiveFieldOfView()
     {
-        return Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(_fov), _aspectRatio, 0.1f, 100.0f);
+        return Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(_fov), _aspectRatio, _depthNear, _depthFar);
     }
 
     public void KeyboardHandler(KeyboardState state, double deltaTime)

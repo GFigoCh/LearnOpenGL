@@ -10,16 +10,40 @@ public class Lighting_Cube : IDisposable
     private int _vertexBufferObject = 0;
     private float[] _vertices = {
         // Front
-        -0.5f, -0.5f, 0.5f,
-        0.5f, -0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f,
-        -0.5f, 0.5f, 0.5f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
 
         // Back
-        -0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, 0.5f, -0.5f,
-        -0.5f, 0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+
+        // Top
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+
+        // Left
+        -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+
+        // Right
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+
+        // Bottom
+        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
     };
     private int _elementBufferObject = 0;
     private uint[] _indices = {
@@ -32,25 +56,28 @@ public class Lighting_Cube : IDisposable
         6, 7, 4,
 
         // Top
-        3, 2, 6,
-        6, 7, 3,
-
-        // Bottom
-        0, 1, 5,
-        5, 4, 0,
+        8, 9, 10,
+        10, 11, 8,
 
         // Left
-        0, 4, 7,
-        7, 3, 0,
+        12, 13, 14,
+        14, 15, 12,
 
         // Right
-        1, 5, 6,
-        6, 2, 1,
+        16, 17, 18,
+        18, 19, 16,
+
+        // Bottom
+        20, 21, 22,
+        22, 23, 20,
     };
     private Matrix4 _model;
+    private Matrix3 _mNormal;
     private bool _disposedValue = false;
 
-    public Lighting_Cube(Matrix4 view, Matrix4 projection)
+    private Vector3 _viewPosition;
+
+    public Lighting_Cube()
     {
         _shader = new Shader("Shaders/l_cube.vert", "Shaders/l_cube.frag");
         _shader.Use();
@@ -67,14 +94,17 @@ public class Lighting_Cube : IDisposable
         GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
         
         int aPositionLocation = _shader.GetAttribLocation("aPosition");
-        GL.VertexAttribPointer(aPositionLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+        GL.VertexAttribPointer(aPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
         GL.EnableVertexAttribArray(aPositionLocation);
 
-        _model = Matrix4.CreateTranslation(-1.0f, 0.0f, 0.0f);
-        _shader.SetCoordinateSystem("model", ref _model);
+        int aNormalLocation = _shader.GetAttribLocation("aNormal");
+        GL.VertexAttribPointer(aNormalLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
+        GL.EnableVertexAttribArray(aNormalLocation);
 
-        _shader.SetCoordinateSystem("view", ref view);
-        _shader.SetCoordinateSystem("projection", ref projection);
+        _model = Matrix4.CreateScale(2.0f);
+        _shader.SetUniformMatrix4("model", ref _model);
+        _mNormal = Matrix3.Transpose(Matrix3.Invert(new Matrix3(_model)));
+        _shader.SetUniformMatrix3("mNormal", ref _mNormal);
     }
 
     public void Draw(Matrix4 view, Matrix4 projection, double deltaTime)
@@ -82,20 +112,32 @@ public class Lighting_Cube : IDisposable
         _shader.Use();
         GL.BindVertexArray(_vertexArrayObject);
 
-        _shader.SetCoordinateSystem("view", ref view);
-        _shader.SetCoordinateSystem("projection", ref projection);
+        _shader.SetUniformMatrix4("view", ref view);
+        _shader.SetUniformMatrix4("projection", ref projection);
+
+        _shader.SetUniform3("viewPosition", _viewPosition);
 
         GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
     }
 
-    public void SetObjectColor(Vector4 vector)
+    public void SetObjectColor(Vector3 vector)
     {
-        _shader.SetUniform4("objectColor", vector);
+        _shader.SetUniform3("objectColor", vector);
     }
 
-    public void SetLightColor(Vector4 vector)
+    public void SetLightColor(Vector3 vector)
     {
-        _shader.SetUniform4("lightColor", vector);
+        _shader.SetUniform3("lightColor", vector);
+    }
+
+    public void SetLightPosition(Vector3 vector)
+    {
+        _shader.SetUniform3("lightPosition", vector);
+    }
+
+    public void SetViewPosition(Vector3 vector)
+    {
+        _viewPosition = vector;
     }
 
     protected virtual void Dispose(bool disposing)

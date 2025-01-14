@@ -64,19 +64,24 @@ public class Shader : IDisposable
         return GL.GetUniformLocation(_handle, uniformName);
     }
 
-    public void SetTextureSampler(string samplerName, int index)
+    public void SetUniform1Int(string name, int value)
     {
-        GL.Uniform1(GetUniformLocation(samplerName), index);
+        GL.Uniform1(GetUniformLocation(name), value);
     }
 
-    public void SetCoordinateSystem(string name, ref Matrix4 matrix)
+    public void SetUniform3(string name, Vector3 vector)
+    {
+        GL.Uniform3(GetUniformLocation(name), vector);
+    }
+
+    public void SetUniformMatrix3(string name, ref Matrix3 matrix)
+    {
+        GL.UniformMatrix3(GetUniformLocation(name), false, ref matrix);
+    }
+
+    public void SetUniformMatrix4(string name, ref Matrix4 matrix)
     {
         GL.UniformMatrix4(GetUniformLocation(name), false, ref matrix);
-    }
-
-    public void SetUniform4(string name, Vector4 vector)
-    {
-        GL.Uniform4(GetUniformLocation(name), vector);
     }
 
     protected virtual void Dispose(bool disposing)

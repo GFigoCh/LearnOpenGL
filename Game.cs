@@ -31,16 +31,19 @@ public class Game : GameWindow
         var cameraTarget = new Vector3(0.0f, 0.0f, 1.0f);
         var cameraUp = new Vector3(0.0f, 1.0f, 0.0f);
         _camera = new Camera(cameraPosition, cameraTarget, cameraUp, FramebufferSize.X / (float)FramebufferSize.Y);
-        _view = _camera.LookAt();
-        _projection = _camera.CreatePerspectiveFieldOfView();
         
-        var lightColor = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-        var cubeColor = new Vector4(1.0f, 0.5f, 0.3f, 1.0f);
-        _lLight = new Lighting_Light(_view, _projection);
+        var lightColor = new Vector3(1.0f, 1.0f, 1.0f);
+        var lightPosition = new Vector3(4.0f, 2.0f, 4.0f);
+        var cubeColor = new Vector3(1.0f, 0.5f, 0.3f);
+
+        _lLight = new Lighting_Light();
         _lLight.SetObjectColor(lightColor);
-        _lCube = new Lighting_Cube(_view, _projection);
+        _lLight.SetObjectPosition(lightPosition);
+
+        _lCube = new Lighting_Cube();
         _lCube.SetObjectColor(cubeColor);
         _lCube.SetLightColor(lightColor);
+        _lCube.SetLightPosition(lightPosition);
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)
@@ -52,8 +55,10 @@ public class Game : GameWindow
         _view = _camera.LookAt();
         _projection = _camera.CreatePerspectiveFieldOfView();
 
-        _lCube.Draw(_view, _projection, args.Time);
         _lLight.Draw(_view, _projection, args.Time);
+
+        _lCube.SetViewPosition(_camera.Position);
+        _lCube.Draw(_view, _projection, args.Time);
 
         SwapBuffers();
     }
@@ -104,7 +109,7 @@ public class Game : GameWindow
     {
         base.OnUnload();
 
-        _lCube.Dispose();
         _lLight.Dispose();
+        _lCube.Dispose();
     }
 }

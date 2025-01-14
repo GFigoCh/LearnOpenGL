@@ -50,7 +50,7 @@ public class Lighting_Light : IDisposable
     private Matrix4 _model;
     private bool _disposedValue = false;
 
-    public Lighting_Light(Matrix4 view, Matrix4 projection)
+    public Lighting_Light()
     {
         _shader = new Shader("Shaders/l_light.vert", "Shaders/l_light.frag");
         _shader.Use();
@@ -70,11 +70,8 @@ public class Lighting_Light : IDisposable
         GL.VertexAttribPointer(aPositionLocation, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
         GL.EnableVertexAttribArray(aPositionLocation);
 
-        _model = Matrix4.CreateScale(0.25f) * Matrix4.CreateTranslation(1.0f, 0.0f, 0.0f);
-        _shader.SetCoordinateSystem("model", ref _model);
-
-        _shader.SetCoordinateSystem("view", ref view);
-        _shader.SetCoordinateSystem("projection", ref projection);
+        _model = Matrix4.CreateScale(0.25f);
+        _shader.SetUniformMatrix4("model", ref _model);
     }
 
     public void Draw(Matrix4 view, Matrix4 projection, double deltaTime)
@@ -82,15 +79,21 @@ public class Lighting_Light : IDisposable
         _shader.Use();
         GL.BindVertexArray(_vertexArrayObject);
 
-        _shader.SetCoordinateSystem("view", ref view);
-        _shader.SetCoordinateSystem("projection", ref projection);
+        _shader.SetUniformMatrix4("view", ref view);
+        _shader.SetUniformMatrix4("projection", ref projection);
 
         GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
     }
 
-    public void SetObjectColor(Vector4 vector)
+    public void SetObjectColor(Vector3 vector)
     {
-        _shader.SetUniform4("objectColor", vector);
+        _shader.SetUniform3("objectColor", vector);
+    }
+
+    public void SetObjectPosition(Vector3 vector)
+    {
+        var model = _model * Matrix4.CreateTranslation(vector);
+        _shader.SetUniformMatrix4("model", ref model);
     }
 
     protected virtual void Dispose(bool disposing)

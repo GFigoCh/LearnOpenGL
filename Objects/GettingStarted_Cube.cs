@@ -76,15 +76,15 @@ public class GettingStarted_Cube : IDisposable
     private Matrix4 _model;
     private bool _disposedValue = false;
 
-    public GettingStarted_Cube(Matrix4 view, Matrix4 projection)
+    public GettingStarted_Cube()
     {
         _shader = new Shader("Shaders/gs_cube.vert", "Shaders/gs_cube.frag");
         _shader.Use();
 
         _texture = new Texture(TextureUnit.Texture0, "Textures/container_wood.jpg");
         _textureLayer = new Texture(TextureUnit.Texture1, "Textures/leaf_corners.png");
-        _shader.SetTextureSampler("texture0", 0);
-        _shader.SetTextureSampler("texture1", 1);
+        _shader.SetUniform1Int("texture0", 0);
+        _shader.SetUniform1Int("texture1", 1);
 
         _vertexArrayObject = GL.GenVertexArray();
         GL.BindVertexArray(_vertexArrayObject);
@@ -106,10 +106,6 @@ public class GettingStarted_Cube : IDisposable
         GL.EnableVertexAttribArray(aTextureLocation);
 
         _model = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45.0f));
-        _shader.SetCoordinateSystem("model", ref _model);
-
-        _shader.SetCoordinateSystem("view", ref view);
-        _shader.SetCoordinateSystem("projection", ref projection);
     }
 
     public void Draw(Matrix4 view, Matrix4 projection, double deltaTime)
@@ -120,10 +116,10 @@ public class GettingStarted_Cube : IDisposable
         GL.BindVertexArray(_vertexArrayObject);
 
         _model *= Matrix4.CreateRotationY(MathHelper.DegreesToRadians((float)deltaTime * 45.0f));
-        _shader.SetCoordinateSystem("model", ref _model);
+        _shader.SetUniformMatrix4("model", ref _model);
 
-        _shader.SetCoordinateSystem("view", ref view);
-        _shader.SetCoordinateSystem("projection", ref projection);
+        _shader.SetUniformMatrix4("view", ref view);
+        _shader.SetUniformMatrix4("projection", ref projection);
 
         GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
     }
